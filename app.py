@@ -1,10 +1,8 @@
-import os
-import gradio as gr
 from contextlib import nullcontext
+import gradio as gr
 import torch
 from torch import autocast
 from diffusers import StableDiffusionPipeline
-from ray.serve.gradio_integrations import GradioServer
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -154,10 +152,6 @@ with block:
               Generate new Pokémon from a text description,
                 <a href="https://lambdalabs.com/blog/how-to-fine-tune-stable-diffusion-how-we-made-the-text-to-pokemon-model-at-lambda/">created by Lambda Labs</a>.
               </p>
-              <p style="margin-bottom: 10px; font-size: 94%">
-              Running on Lambda Cloud 
-                <a href="https://lambdalabs.com/service/gpu-cloud">A10 GPU Instances</a>.
-              </p>
             </div>
         """
     )
@@ -216,15 +210,4 @@ with block:
            """
         )
 
-# without rayserve
-# block.launch()
-
-# With rayserve
-num_replicas = (
-    os.getenv("DEMO_NUM_REPLICAS")
-    if "DEMO_NUM_REPLICAS" in os.environ
-    else torch.cuda.device_count()
-)
-app = GradioServer.options(
-    num_replicas=num_replicas, ray_actor_options={"num_gpus": 1.0, "num_cpus": 16.0}
-).bind(block)
+block.launch()
